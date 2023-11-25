@@ -1,0 +1,29 @@
+#include<wire.h>
+const int sensorPin = AO;//LM35 sensor connected to analog pin AO
+const int ledPin = 13; //onboard LED pin
+float temperature = 0.0;
+int blinkInterval = 250; //default blink interval
+void setup() {
+wire.begin(); //Intialize I2C communication
+pinMode(ledPin,OUTPUT);
+Serial.begin(9600);
+}
+void loop() {
+readTemperature();
+if(temperature<30.0) {
+blinkInterval=250;
+}else{
+blinkInterval=500;
+}
+digitalWrite(ledPin,HIGH);
+delay(blinkInterval/2); //half of the interval
+digitalWrite(ledPin,LOW);
+delay(blinkInterval/2); //half of the interval
+}
+void readTemperature(){
+Wire.requestFrom(8,2); //Request 2 byte from the LM35 sensor
+while(Wire.available()<2); // wait until 2 byte are received
+int reading=Wire.read()<<8;
+reading|=Wire.read();
+temperature=(reading*0.48876); // convert the reading to celsius
+}
